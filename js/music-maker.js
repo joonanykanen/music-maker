@@ -31,15 +31,51 @@ for (let i = 0; i < tracks.length; i++) {
 // Adding the sample buttons to the page, each sample will generate its own button
 const addButtons = document.getElementById("addButtons")
 let id = 0
-samples.forEach((sample) => {
+samples.forEach((sample, index) => {
+    const newButton = document.createElement("button");
+    newButton.classList.add("btn", "btn-primary", "me-2", "mb-2");
+    newButton.setAttribute("data-id", index); // Set the data-id to the sample index
+    newButton.draggable = true; // Make the sample buttons draggable
+    newButton.addEventListener("dragstart", (event) => dragStart(event, newButton));
+    newButton.innerText = sample.name;
+    addButtons.appendChild(newButton);
+});
 
-    const newButton = document.createElement("button")
-    newButton.classList.add("btn", "btn-primary", "me-2", "mb-2")
-    newButton.setAttribute("data-id", id++)
-    newButton.addEventListener("click", () => addSample(newButton))
-    newButton.innerText = sample.name
-    addButtons.appendChild(newButton)
-})
+const tracksContainer = document.getElementById("tracks-container");
+tracksContainer.addEventListener("dragover", dragOver);
+tracksContainer.addEventListener("drop", dropSample);
+
+function dragStart(event, addButton) {
+    event.dataTransfer.setData("text/plain", addButton.dataset.id); // Set the data-id as the sample index
+}
+
+function dragOver(event) {
+    event.preventDefault();
+}
+
+function dropSample(event) {
+    event.preventDefault();
+    const sampleNumber = event.dataTransfer.getData("text/plain");
+    const trackDiv = event.target.closest(".track");
+    
+    if (!trackDiv) {
+        return; // If the drop target is not a track, do nothing.
+    }
+
+    const trackNumber = Array.from(trackDiv.parentElement.children).indexOf(trackDiv);
+
+    tracks[trackNumber].push(samples[sampleNumber]);
+
+    const trackItemsDiv = document.getElementById(`trackItems${trackNumber}`);
+    const newItem = document.createElement("div");
+    newItem.classList.add("track-item");
+    newItem.innerHTML = `
+        <span class="me-2">${samples[sampleNumber].name}</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem(${trackNumber}, ${tracks[trackNumber].length - 1})">Delete</button>
+    `;
+    trackItemsDiv.appendChild(newItem);
+}
+
 
 // By pressing the sample button, the sample is added to the tracks array and to the trackItems div
 function addSample(addButton) {
@@ -57,7 +93,6 @@ function addSample(addButton) {
     `;
     trackItemsDiv.appendChild(newItem);
 }
-
 
 const playButton = document.getElementById("play")
 playButton.addEventListener("click", () => playSong())
@@ -200,5 +235,7 @@ removeTrackButton.classList.add("btn", "btn-danger", "me-2", "mb-2");
 removeTrackButton.innerText = "Remove Track";
 removeTrackButton.addEventListener("click", removeTrack);
 document.getElementById("addButtons").appendChild(removeTrackButton);
+
+
 
 // eof
