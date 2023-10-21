@@ -1,4 +1,3 @@
-
 // Array for mp3 samples, items are object having file source and name
 const samples = []
 
@@ -17,13 +16,14 @@ tracks.push([])
 tracks.push([])
 
 // Let's add these tracks to HTML page, so that user can see them
-tracksDiv = document.getElementById("tracks")
+const tracksDiv = document.getElementById("tracks")
 for(let i = 0; i < tracks.length; i++) {
-    let trackDiv = document.createElement("div")
-    trackDiv.setAttribute("id", "trackDiv" + i)
-    let trackDivHeader = document.createElement("h2")
-    trackDivHeader.innerText = "Track " + (i + 1)
-    trackDiv.appendChild(trackDivHeader)
+    const trackDiv = document.createElement("div")
+    trackDiv.classList.add("mb-4")
+    trackDiv.innerHTML = `
+      <h2>Track ${i + 1}</h2>
+      <div id="trackItems${i}"></div>
+    `
     tracksDiv.appendChild(trackDiv)
 }
 
@@ -31,16 +31,16 @@ for(let i = 0; i < tracks.length; i++) {
 const addButtons = document.getElementById("addButtons")
 let id = 0
 samples.forEach((sample) => {
-    console.log(sample.name)
 
-    let newButton = document.createElement("button")
+    const newButton = document.createElement("button")
+    newButton.classList.add("btn", "btn-primary", "me-2", "mb-2")
     newButton.setAttribute("data-id", id++)
     newButton.addEventListener("click", () => addSample(newButton))
     newButton.innerText = sample.name
     addButtons.appendChild(newButton)
 })
 
-// By pressing the sample button the sample is added to the tracks array and to the track div
+// By pressing the sample button the sample is added to the tracks array and to the trackItems div
 function addSample(addButton) {
     const sampleNumber = addButton.dataset.id
     const trackNumber = document.querySelector("input[name='track']:checked").value
@@ -50,10 +50,13 @@ function addSample(addButton) {
 
     tracks[trackNumber].push(samples[sampleNumber])
 
-    let trackDiv = document.getElementById("trackDiv" + trackNumber)
-    let newItem = document.createElement("div")
-    newItem.innerText = samples[sampleNumber].name
-    trackDiv.appendChild(newItem)
+    const trackItemsDiv = document.getElementById(`trackItems${trackNumber}`)
+    const newItem = document.createElement("div")
+    newItem.innerHTML = `
+      <span class="me-2">${samples[sampleNumber].name}</span>
+      <button class="btn btn-danger btn-sm" onclick="deleteItem(${trackNumber}, ${tracks[trackNumber].length - 1})">Delete</button>
+    `
+    trackItemsDiv.appendChild(newItem)
 }
 
 const playButton = document.getElementById("play")
@@ -70,7 +73,7 @@ function playSong() {
     })
 }
 
-// Track is looped – that means it is restarted each time its samples are playd through
+// Track is looped – that means it is restarted each time its samples are played through
 function playTrack(track, trackNumber) {
     let audio = new Audio()
     let i = 0
@@ -87,7 +90,7 @@ function playTrack(track, trackNumber) {
     console.log("Starting: Track " + trackNumber + ", instrument " + track[i].name)
 }
 
-// There is a upload button that adds a sample to samples array and a sample button with an event listener
+// There is an upload button that adds a sample to samples array and a sample button with an event listener
 const uploadButton = document.getElementById("upload")
 uploadButton.addEventListener("click", () => {
     const file = document.getElementById("input-sample").files[0]
@@ -99,12 +102,18 @@ uploadButton.addEventListener("click", () => {
     samples.push(sample)
     id = samples.length - 1
 
-    let newButton = document.createElement("button")
+    const newButton = document.createElement("button")
+    newButton.classList.add("btn", "btn-primary", "me-2", "mb-2")
     newButton.setAttribute("data-id", id)
     newButton.addEventListener("click", () => addSample(newButton))
     newButton.innerText = sample.name
 
     addButtons.appendChild(newButton)
-
-
 })
+
+// Function to delete a track item from a track
+function deleteItem(trackNumber, itemIndex) {
+  tracks[trackNumber].splice(itemIndex, 1)
+  const trackItemsDiv = document.getElementById(`trackItems${trackNumber}`)
+  trackItemsDiv.removeChild(trackItemsDiv.childNodes[itemIndex])
+}

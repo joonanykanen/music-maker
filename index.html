@@ -5,28 +5,38 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Maker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="js/music-maker.js" defer></script>
 </head>
 <body>
-    <h1>Music Maker</h1>
-    <button id="play">Play</button>
-    <input type="file" id="input-sample" name="input-sample" accept="audio/*">
-    <button id="upload">Add new sample</button>
-    <br>
+    <div class="container">
+      <h1 class="mt-4 mb-4">Music Maker</h1>
+      <button id="play" class="btn btn-primary">Play</button>
+      <input type="file" id="input-sample" name="input-sample" accept="audio/*">
+      <button id="upload" class="btn btn-secondary">Add new sample</button>
+      <br>
 
-    <input type="radio" id="track1" name="track" value="0" checked>
-    <label for="track1">Track 1</label><br>
-    <input type="radio" id="track2" name="track" value="1">
-    <label for="track2">Track 2</label><br>
-    <input type="radio" id="track3" name="track" value="2">
-    <label for="track3">Track 3</label><br>
-    <input type="radio" id="track4" name="track" value="3">
-    <label for="track4">Track 4</label><br>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="track" id="track1" value="0" checked>
+        <label class="form-check-label" for="track1">Track 1</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="track" id="track2" value="1">
+        <label class="form-check-label" for="track2">Track 2</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="track" id="track3" value="2">
+        <label class="form-check-label" for="track3">Track 3</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="track" id="track4" value="3">
+        <label class="form-check-label" for="track4">Track 4</label>
+      </div>
 
-    <div id="addButtons"></div>
+      <div id="addButtons" class="mt-4"></div>
 
-    <div id="tracks"></div>
-
-    
+      <div id="tracks" class="mt-4"></div>
+    </div>
 </body>
 </html>
