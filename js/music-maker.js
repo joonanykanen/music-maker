@@ -28,17 +28,24 @@ for (let i = 0; i < tracks.length; i++) {
     tracksDiv.appendChild(trackDiv);
 }
 
+// Function to create a new sample button
+function createSampleButton(sample, id) {
+    const newButton = document.createElement("button");
+    newButton.classList.add("btn", "btn-primary", "me-2", "mb-2");
+    newButton.setAttribute("data-id", id);
+    newButton.draggable = true;
+    newButton.addEventListener("dragstart", (event) => dragStart(event, newButton));
+    newButton.innerText = sample.name;
+    newButton.addEventListener("click", () => addSample(newButton));
+    addButtons.appendChild(newButton);
+}
+
 // Adding the sample buttons to the page, each sample will generate its own button
 const addButtons = document.getElementById("addButtons")
 let id = 0
+
 samples.forEach((sample, index) => {
-    const newButton = document.createElement("button");
-    newButton.classList.add("btn", "btn-primary", "me-2", "mb-2");
-    newButton.setAttribute("data-id", index); // Set the data-id to the sample index
-    newButton.draggable = true; // Make the sample buttons draggable
-    newButton.addEventListener("dragstart", (event) => dragStart(event, newButton));
-    newButton.innerText = sample.name;
-    addButtons.appendChild(newButton);
+    createSampleButton(sample, index);
 });
 
 const tracksContainer = document.getElementById("tracks-container");
@@ -46,7 +53,7 @@ tracksContainer.addEventListener("dragover", dragOver);
 tracksContainer.addEventListener("drop", dropSample);
 
 function dragStart(event, addButton) {
-    event.dataTransfer.setData("text/plain", addButton.dataset.id); // Set the data-id as the sample index
+    event.dataTransfer.setData("text/plain", addButton.dataset.id);
 }
 
 function dragOver(event) {
@@ -82,13 +89,18 @@ function addSample(addButton) {
     const sampleNumber = addButton.dataset.id;
     const trackNumber = document.querySelector("input[name='track']:checked").value;
 
-    tracks[trackNumber].push(samples[sampleNumber]);
+    const newSample = {
+        src: samples[sampleNumber].src,
+        name: samples[sampleNumber].name
+    };
+
+    tracks[trackNumber].push(newSample);
 
     const trackItemsDiv = document.getElementById(`trackItems${trackNumber}`);
     const newItem = document.createElement("div");
     newItem.classList.add("track-item");
     newItem.innerHTML = `
-        <span class="me-2">${samples[sampleNumber].name}</span>
+        <span class="me-2">${newSample.name}</span>
         <button class="btn btn-danger btn-sm" onclick="deleteItem(${trackNumber}, ${tracks[trackNumber].length - 1})">Delete</button>
     `;
     trackItemsDiv.appendChild(newItem);
@@ -126,25 +138,20 @@ function playTrack(track, trackNumber) {
 }
 
 // There is an upload button that adds a sample to samples array and a sample button with an event listener
-const uploadButton = document.getElementById("upload")
+const uploadButton = document.getElementById("upload");
 uploadButton.addEventListener("click", () => {
-    const file = document.getElementById("input-sample").files[0]
-    let audioSrc = ""
-    if(!file) return
-    
-    audioSrc = URL.createObjectURL(file)
-    let sample = {src: audioSrc, name: "New Sample"}
-    samples.push(sample)
-    id = samples.length - 1
+    const file = document.getElementById("input-sample").files[0];
+    let audioSrc = "";
 
-    const newButton = document.createElement("button")
-    newButton.classList.add("btn", "btn-primary", "me-2", "mb-2")
-    newButton.setAttribute("data-id", id)
-    newButton.addEventListener("click", () => addSample(newButton))
-    newButton.innerText = sample.name
+    if (!file) return;
 
-    addButtons.appendChild(newButton)
-})
+    audioSrc = URL.createObjectURL(file);
+    let sample = { src: audioSrc, name: "New Sample" };
+    samples.push(sample);
+    id = samples.length - 1;
+
+    createSampleButton(sample, id); // Call the createSampleButton function for the new sample
+});
 
 // Function to delete a track item from a track
 function deleteItem(trackNumber, itemIndex) {
