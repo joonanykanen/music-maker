@@ -117,3 +117,88 @@ function deleteItem(trackNumber, itemIndex) {
   const trackItemsDiv = document.getElementById(`trackItems${trackNumber}`)
   trackItemsDiv.removeChild(trackItemsDiv.childNodes[itemIndex])
 }
+
+// Function to add a new track
+function addTrack() {
+    const trackIndex = tracks.length;
+    const newTrackDiv = document.createElement("div");
+    newTrackDiv.classList.add("form-check");
+    newTrackDiv.innerHTML = `
+        <input class="form-check-input" type="radio" name="track" id="track${trackIndex}" value="${trackIndex}">
+        <label class="form-check-label" for="track${trackIndex}">Track ${trackIndex + 1}</label>
+    `;
+    const trackSelectionDiv = document.getElementById("track-selection");
+    trackSelectionDiv.appendChild(newTrackDiv);
+
+    const newTrack = [];
+    tracks.push(newTrack);
+
+    const trackDiv = document.createElement("div");
+    trackDiv.classList.add("track");
+    trackDiv.innerHTML = `
+        <h2>Track ${trackIndex + 1}</h2>
+        <div id="trackItems${trackIndex}" class="track-items"></div>
+    `;
+    console.log("Created a new track.")
+    const tracksDiv = document.getElementById("tracks");
+    tracksDiv.appendChild(trackDiv);
+}
+
+// Event listener for adding a new track
+const addTrackButton = document.createElement("button");
+addTrackButton.classList.add("btn", "btn-success", "me-2", "mb-2");
+addTrackButton.innerText = "Add Track";
+addTrackButton.addEventListener("click", addTrack);
+document.getElementById("addButtons").appendChild(addTrackButton);
+
+// Function to remove a track
+function removeTrack() {
+    const selectedTrack = document.querySelector("input[name='track']:checked");
+    if (selectedTrack) {
+        const trackIndex = parseInt(selectedTrack.value, 10);
+        tracks.splice(trackIndex, 1);
+        updateTrackSelection();
+        updateTracksDisplay();
+    }
+}
+
+// Function to update the track selection (after removing a track)
+function updateTrackSelection() {
+    const trackSelectionDiv = document.getElementById("track-selection");
+    trackSelectionDiv.innerHTML = "";
+
+    for (let i = 0; i < tracks.length; i++) {
+        const trackOption = document.createElement("div");
+        trackOption.classList.add("form-check");
+        trackOption.innerHTML = `
+            <input class="form-check-input" type="radio" name="track" id="track${i}" value="${i}" ${(i === 0 ? 'checked' : '')}>
+            <label class="form-check-label" for="track${i}">Track ${i + 1}</label>
+        `;
+        trackSelectionDiv.appendChild(trackOption);
+    }
+}
+
+// Function to update the tracks display (after removing a track)
+function updateTracksDisplay() {
+    const tracksDiv = document.getElementById("tracks");
+    tracksDiv.innerHTML = "";
+
+    for (let i = 0; i < tracks.length; i++) {
+        const trackDiv = document.createElement("div");
+        trackDiv.classList.add("track");
+        trackDiv.innerHTML = `
+            <h2>Track ${i + 1}</h2>
+            <div id="trackItems${i}" class="track-items"></div>
+        `;
+        tracksDiv.appendChild(trackDiv);
+    }
+}
+
+// Event listener for removing a track
+const removeTrackButton = document.createElement("button");
+removeTrackButton.classList.add("btn", "btn-danger", "me-2", "mb-2");
+removeTrackButton.innerText = "Remove Track";
+removeTrackButton.addEventListener("click", removeTrack);
+document.getElementById("addButtons").appendChild(removeTrackButton);
+
+// eof
