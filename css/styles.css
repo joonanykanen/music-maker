@@ -1,0 +1,23 @@
+
+#tracks-container {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+#tracks {
+    display: flex;
+}
+
+.track {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.track-items {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 5px;
+}

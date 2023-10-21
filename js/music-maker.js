@@ -15,16 +15,17 @@ tracks.push([])
 tracks.push([])
 tracks.push([])
 
-// Let's add these tracks to HTML page, so that user can see them
-const tracksDiv = document.getElementById("tracks")
-for(let i = 0; i < tracks.length; i++) {
-    const trackDiv = document.createElement("div")
-    trackDiv.classList.add("mb-4")
+// Let's add these tracks to HTML page in a horizontal layout
+const tracksDiv = document.getElementById("tracks");
+
+for (let i = 0; i < tracks.length; i++) {
+    const trackDiv = document.createElement("div");
+    trackDiv.classList.add("track");
     trackDiv.innerHTML = `
-      <h2>Track ${i + 1}</h2>
-      <div id="trackItems${i}"></div>
-    `
-    tracksDiv.appendChild(trackDiv)
+        <h2>Track ${i + 1}</h2>
+        <div id="trackItems${i}" class="track-items"></div>
+    `;
+    tracksDiv.appendChild(trackDiv);
 }
 
 // Adding the sample buttons to the page, each sample will generate its own button
@@ -40,24 +41,23 @@ samples.forEach((sample) => {
     addButtons.appendChild(newButton)
 })
 
-// By pressing the sample button the sample is added to the tracks array and to the trackItems div
+// By pressing the sample button, the sample is added to the tracks array and to the trackItems div
 function addSample(addButton) {
-    const sampleNumber = addButton.dataset.id
-    const trackNumber = document.querySelector("input[name='track']:checked").value
+    const sampleNumber = addButton.dataset.id;
+    const trackNumber = document.querySelector("input[name='track']:checked").value;
 
-    console.log("Sample number: " + sampleNumber)
-    console.log("Track number: " + trackNumber)
+    tracks[trackNumber].push(samples[sampleNumber]);
 
-    tracks[trackNumber].push(samples[sampleNumber])
-
-    const trackItemsDiv = document.getElementById(`trackItems${trackNumber}`)
-    const newItem = document.createElement("div")
+    const trackItemsDiv = document.getElementById(`trackItems${trackNumber}`);
+    const newItem = document.createElement("div");
+    newItem.classList.add("track-item");
     newItem.innerHTML = `
-      <span class="me-2">${samples[sampleNumber].name}</span>
-      <button class="btn btn-danger btn-sm" onclick="deleteItem(${trackNumber}, ${tracks[trackNumber].length - 1})">Delete</button>
-    `
-    trackItemsDiv.appendChild(newItem)
+        <span class="me-2">${samples[sampleNumber].name}</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem(${trackNumber}, ${tracks[trackNumber].length - 1})">Delete</button>
+    `;
+    trackItemsDiv.appendChild(newItem);
 }
+
 
 const playButton = document.getElementById("play")
 playButton.addEventListener("click", () => playSong())
