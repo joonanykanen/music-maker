@@ -8,6 +8,8 @@
     display: flex;
     flex-direction: column; /* Arrange tracks vertically */
     align-items: flex-start; /* Align tracks to the left */
+    background-color: #f2f2f2; /* Background color for the track view */
+    padding: 10px; /* Add padding to the track view */
 }
 
 .track {
@@ -15,8 +17,26 @@
     flex-direction: row; /* Arrange samples horizontally within a track */
     align-items: center;
     margin-bottom: 10px; /* Adjust the spacing between tracks */
+    border-bottom: 1px solid #ccc; /* Horizontal line between tracks */
+    padding: 10px 0; /* Add padding to the tracks */
 }
 
 .track-item {
     margin-right: 10px; /* Adjust the spacing between samples in a track */
+}
+
+.sample-button {
+    display: inline-block; /* Display the sample buttons inline horizontally */
+    margin-right: 10px; /* Add horizontal margin for spacing */
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px; /* Set a maximum width to prevent buttons from becoming too wide */
+}
+
+.wavesurfer-container {
+    display: inline-block;
+    width: 200px; /* Adjust the width to your preference */
+    height: 100px; /* Adjust the height to your preference */
 }

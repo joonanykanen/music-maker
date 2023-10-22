@@ -1,5 +1,7 @@
 // Array for mp3 samples, items are object having file source and name
 const samples = []
+const sampleButtons = document.getElementById("sampleButtons");
+let id = 0
 
 samples.push({src: "audio/bass.mp3", name: "Bass"})
 samples.push({src: "audio/drum.mp3", name: "Drum"})
@@ -28,21 +30,78 @@ for (let i = 0; i < tracks.length; i++) {
     tracksDiv.appendChild(trackDiv);
 }
 
+
+// Function to add a new track
+function addTrack() {
+    const trackIndex = tracks.length;
+    const newTrackDiv = document.createElement("div");
+    newTrackDiv.classList.add("form-check");
+    newTrackDiv.innerHTML = `
+        <input class="form-check-input" type="radio" name="track" id="track${trackIndex}" value="${trackIndex}">
+        <label class="form-check-label" for="track${trackIndex}">Track ${trackIndex + 1}</label>
+    `;
+    const trackSelectionDiv = document.getElementById("track-selection");
+    trackSelectionDiv.appendChild(newTrackDiv);
+
+    const newTrack = [];
+    tracks.push(newTrack);
+
+    const trackDiv = document.createElement("div");
+    trackDiv.classList.add("track");
+    trackDiv.innerHTML = `
+        <h2>Track ${trackIndex + 1}</h2>
+        <div id="trackItems${trackIndex}" class="track-items"></div>
+    `;
+    console.log("Created a new track.")
+    const tracksDiv = document.getElementById("tracks");
+    tracksDiv.appendChild(trackDiv);
+}
+
+// Event listener for adding a new track
+const addTrackButton = document.createElement("button");
+addTrackButton.classList.add("btn", "btn-success", "me-2", "mb-2");
+addTrackButton.innerText = "Add Track";
+addTrackButton.addEventListener("click", addTrack);
+const addButtons = document.getElementById("addButtons");
+addButtons.appendChild(addTrackButton);
+
+// Function to remove a track
+function removeTrack() {
+    const selectedTrack = document.querySelector("input[name='track']:checked");
+    if (selectedTrack) {
+        const trackIndex = parseInt(selectedTrack.value, 10);
+        tracks.splice(trackIndex, 1);
+        updateTrackSelection();
+        updateTracksDisplay();
+    }
+}
+
+// Event listener for removing a track
+const removeTrackButton = document.createElement("button");
+removeTrackButton.classList.add("btn", "btn-danger", "me-2", "mb-2");
+removeTrackButton.innerText = "Remove Track";
+removeTrackButton.addEventListener("click", removeTrack);
+addButtons.appendChild(removeTrackButton);
+
+
 // Function to create a new sample button
 function createSampleButton(sample, id) {
     const newButton = document.createElement("button");
-    newButton.classList.add("btn", "btn-primary", "me-2", "mb-2");
+    newButton.classList.add("btn", "btn-primary", "me-2", "mb-2", "sample-button");
     newButton.setAttribute("data-id", id);
     newButton.draggable = true;
-    newButton.addEventListener("dragstart", (event) => dragStart(event, newButton));
     newButton.innerText = sample.name;
+
+    // Add drag start event listener to the sample button
+    newButton.addEventListener("dragstart", (event) => dragStart(event, newButton, id));
+
+    // Add an event listener to add the sample to the track when the button is clicked
     newButton.addEventListener("click", () => addSample(newButton));
-    addButtons.appendChild(newButton);
+
+    // Add the sample button to the sampleButtons div
+    sampleButtons.appendChild(newButton);
 }
 
-// Adding the sample buttons to the page, each sample will generate its own button
-const addButtons = document.getElementById("addButtons")
-let id = 0
 
 samples.forEach((sample, index) => {
     createSampleButton(sample, index);
@@ -52,8 +111,9 @@ const tracksContainer = document.getElementById("tracks-container");
 tracksContainer.addEventListener("dragover", dragOver);
 tracksContainer.addEventListener("drop", dropSample);
 
-function dragStart(event, addButton) {
-    event.dataTransfer.setData("text/plain", addButton.dataset.id);
+// Update the dragStart function to include the ID of the Wavesurfer container
+function dragStart(event, addButton, id) {
+    event.dataTransfer.setData("text/plain", id);
 }
 
 function dragOver(event) {
@@ -62,26 +122,48 @@ function dragOver(event) {
 
 function dropSample(event) {
     event.preventDefault();
-    const sampleNumber = event.dataTransfer.getData("text/plain");
+    const sampleId = event.dataTransfer.getData("text/plain");
     const trackDiv = event.target.closest(".track");
-    
+
     if (!trackDiv) {
         return; // If the drop target is not a track, do nothing.
     }
 
     const trackNumber = Array.from(trackDiv.parentElement.children).indexOf(trackDiv);
 
-    tracks[trackNumber].push(samples[sampleNumber]);
+    // Get the sample corresponding to the ID
+    const sample = samples[sampleId];
 
+    // Create a Wavesurfer container for the sample inside the track view
+    const wavesurferContainer = document.createElement("div");
+    wavesurferContainer.classList.add("wavesurfer-container");
+    trackDiv.appendChild(wavesurferContainer);
+
+    // Create a Wavesurfer instance for the sample
+    const wavesurfer = WaveSurfer.create({
+        container: wavesurferContainer,
+        waveColor: 'violet',
+        progressColor: 'purple',
+        cursorWidth: 1,
+    });
+
+    // Load the audio sample
+    wavesurfer.load(sample.src);
+
+    // Add the sample to the track
+    tracks[trackNumber].push(sample);
+
+    // Update the track items in the track view
     const trackItemsDiv = document.getElementById(`trackItems${trackNumber}`);
     const newItem = document.createElement("div");
     newItem.classList.add("track-item");
     newItem.innerHTML = `
-        <span class="me-2">${samples[sampleNumber].name}</span>
+        <span class="me-2">${sample.name}</span>
         <button class="btn btn-danger btn-sm" onclick="deleteItem(${trackNumber}, ${tracks[trackNumber].length - 1})">Delete</button>
     `;
     trackItemsDiv.appendChild(newItem);
 }
+
 
 
 // By pressing the sample button, the sample is added to the tracks array and to the trackItems div
@@ -160,50 +242,6 @@ function deleteItem(trackNumber, itemIndex) {
   trackItemsDiv.removeChild(trackItemsDiv.childNodes[itemIndex])
 }
 
-// Function to add a new track
-function addTrack() {
-    const trackIndex = tracks.length;
-    const newTrackDiv = document.createElement("div");
-    newTrackDiv.classList.add("form-check");
-    newTrackDiv.innerHTML = `
-        <input class="form-check-input" type="radio" name="track" id="track${trackIndex}" value="${trackIndex}">
-        <label class="form-check-label" for="track${trackIndex}">Track ${trackIndex + 1}</label>
-    `;
-    const trackSelectionDiv = document.getElementById("track-selection");
-    trackSelectionDiv.appendChild(newTrackDiv);
-
-    const newTrack = [];
-    tracks.push(newTrack);
-
-    const trackDiv = document.createElement("div");
-    trackDiv.classList.add("track");
-    trackDiv.innerHTML = `
-        <h2>Track ${trackIndex + 1}</h2>
-        <div id="trackItems${trackIndex}" class="track-items"></div>
-    `;
-    console.log("Created a new track.")
-    const tracksDiv = document.getElementById("tracks");
-    tracksDiv.appendChild(trackDiv);
-}
-
-// Event listener for adding a new track
-const addTrackButton = document.createElement("button");
-addTrackButton.classList.add("btn", "btn-success", "me-2", "mb-2");
-addTrackButton.innerText = "Add Track";
-addTrackButton.addEventListener("click", addTrack);
-document.getElementById("addButtons").appendChild(addTrackButton);
-
-// Function to remove a track
-function removeTrack() {
-    const selectedTrack = document.querySelector("input[name='track']:checked");
-    if (selectedTrack) {
-        const trackIndex = parseInt(selectedTrack.value, 10);
-        tracks.splice(trackIndex, 1);
-        updateTrackSelection();
-        updateTracksDisplay();
-    }
-}
-
 // Function to update the track selection (after removing a track)
 function updateTrackSelection() {
     const trackSelectionDiv = document.getElementById("track-selection");
@@ -235,14 +273,6 @@ function updateTracksDisplay() {
         tracksDiv.appendChild(trackDiv);
     }
 }
-
-// Event listener for removing a track
-const removeTrackButton = document.createElement("button");
-removeTrackButton.classList.add("btn", "btn-danger", "me-2", "mb-2");
-removeTrackButton.innerText = "Remove Track";
-removeTrackButton.addEventListener("click", removeTrack);
-document.getElementById("addButtons").appendChild(removeTrackButton);
-
 
 
 // eof
