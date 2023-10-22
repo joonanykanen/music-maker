@@ -79,8 +79,8 @@ function removeTrack() {
     if (selectedTrack) {
         const trackIndex = parseInt(selectedTrack.value, 10);
         tracks.splice(trackIndex, 1);
-        updateTrackSelection();
-        updateTracksDisplay();
+        updateTrackSelection(trackIndex);
+        updateTracksDisplay(trackIndex);
     }
 }
 
@@ -271,34 +271,24 @@ function deleteItem(trackNumber, itemIndex) {
 }
 
 // Function to update the track selection (after removing a track)
-function updateTrackSelection() {
-    const trackSelectionDiv = document.getElementById("track-selection");
-    trackSelectionDiv.innerHTML = "";
-
-    for (let i = 0; i < tracks.length; i++) {
-        const trackOption = document.createElement("div");
-        trackOption.classList.add("form-check");
-        trackOption.innerHTML = `
-            <input class="form-check-input" type="radio" name="track" id="track${i}" value="${i}" ${(i === 0 ? 'checked' : '')}>
-            <label class="form-check-label" for="track${i}">Track ${i + 1}</label>
-        `;
-        trackSelectionDiv.appendChild(trackOption);
+function updateTrackSelection(trackIndex) {
+    const trackRadio = document.getElementById(`track${trackIndex}`);
+    if (trackRadio) {
+        trackRadio.parentElement.remove();
+        
+        // select a new track only if the track removed was selected
+        if (trackRadio.checked && tracks.length > 0) {
+            document.getElementById('track0').checked = true;
+        }
     }
 }
 
 // Function to update the tracks display (after removing a track)
-function updateTracksDisplay() {
-    const tracksDiv = document.getElementById("tracks");
-    tracksDiv.innerHTML = "";
-
-    for (let i = 0; i < tracks.length; i++) {
-        const trackDiv = document.createElement("div");
-        trackDiv.classList.add("track");
-        trackDiv.innerHTML = `
-            <h2>Track ${i + 1}</h2>
-            <div id="trackItems${i}" class="track-items"></div>
-        `;
-        tracksDiv.appendChild(trackDiv);
+function updateTracksDisplay(trackIndex) {
+    const trackDiv = document.getElementById(`tracks`);
+    const trackToRemove = trackDiv.querySelector(`div:nth-child(${trackIndex + 1})`);
+    if (trackToRemove) {
+        trackDiv.removeChild(trackToRemove);
     }
 }
 
