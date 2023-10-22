@@ -315,5 +315,52 @@ function updateTracksDisplay(trackIndex) {
     }
 }
 
+const downloadButton = document.getElementById("download");
+downloadButton.addEventListener("click", downloadSong);
+
+
+async function downloadSong() {
+    // Create a Blob containing the audio data
+    const audioData = await mergeTracks(tracks);
+    const blob = new Blob(audioData, { type: 'audio/mpeg' });
+
+    // Create a temporary URL for the Blob
+    const url = window.URL.createObjectURL(blob);
+
+    // Create a temporary anchor element and trigger the download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'music.mp3';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+}
+
+// Function to merge tracks into a single audio source
+async function mergeTracks(tracks) {
+    const audioData = [];
+
+    // Loop through the tracks and concatenate audio data
+    for (const track of tracks) {
+        for (const sample of track) {
+            const audioBlob = await audioToBlob(sample.src);
+            audioData.push(audioBlob);
+        }
+    }
+
+    return audioData;
+}
+
+// Convert an audio source to a Blob
+async function audioToBlob(src) {
+    const response = await fetch(src);
+    const blob = await response.blob();
+    return blob;
+}
+
 
 // eof
