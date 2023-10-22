@@ -40,3 +40,11 @@
     width: 200px; /* Adjust the width to your preference */
     height: 100px; /* Adjust the height to your preference */
 }
+
+/* Add dark mode styles here */
+body.dark-mode {
+    background-color: #333; /* Dark background color */
+    color: #fff; /* Light text color */
+}
+
+/* eof */

@@ -425,6 +425,16 @@ function stopRecording() {
     }
 }
 
+// Function to toggle dark mode
+function toggleDarkMode() {
+    const body = document.body;
+    body.classList.toggle("dark-mode");
+}
 
+// Get the dark mode toggle button element
+const darkModeToggle = document.getElementById("dark-mode-toggle");
+
+// Add a click event listener to the toggle button
+darkModeToggle.addEventListener("click", toggleDarkMode);
 
 // eof
