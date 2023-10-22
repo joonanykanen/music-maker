@@ -45,6 +45,23 @@ function addTrack() {
     console.log("Created a new track.")
     const tracksDiv = document.getElementById("tracks");
     tracksDiv.appendChild(trackDiv);
+
+    const volumeInput = document.createElement("input");
+    volumeInput.type = "range";
+    volumeInput.min = 0;
+    volumeInput.max = 1;
+    volumeInput.step = 0.1;
+    volumeInput.value = 1; // Initial volume level
+    volumeInput.classList.add("form-range");
+    volumeInput.id = `volume${trackIndex}`;
+    volumeInput.addEventListener("input", (event) => updateTrackVolume(event, trackIndex));
+    
+    const volumeLabel = document.createElement("label");
+    volumeLabel.htmlFor = `volume${trackIndex}`;
+    volumeLabel.innerText = "Volume: ";
+    
+    newTrackDiv.appendChild(volumeLabel);
+    newTrackDiv.appendChild(volumeInput);
 }
 
 
@@ -193,21 +210,41 @@ function playSong() {
     })
 }
 
+function updateTrackVolume(event, trackIndex) {
+    const volume = parseFloat(event.target.value);
+    const audioElements = Array.from(document.getElementsByClassName("audio-track"));
+    
+    audioElements.forEach((audioElement, index) => {
+        if (index === trackIndex) {
+            audioElement.volume = volume;
+        }
+    });
+}
+
+
 // Track is looped – that means it is restarted each time its samples are played through
 function playTrack(track, trackNumber) {
-    let audio = new Audio()
-    let i = 0
+    let audio = new Audio();
+    let i = 0;
     audio.addEventListener("ended", () => {
-        i = ++i < track.length ? i : 0
-        audio.src = track[i].src
-        audio.play()
-        console.log("Starting: Track " + trackNumber + ", instrument " + track[i].name)
-    }, true )
-    audio.volume = 1.0
-    audio.loop = false
-    audio.src = track[0].src
-    audio.play()
-    console.log("Starting: Track " + trackNumber + ", instrument " + track[i].name)
+        i = ++i < track.length ? i : 0;
+        audio.src = track[i].src;
+        audio.play();
+        console.log("Starting: Track " + trackNumber + ", instrument " + track[i].name);
+    }, true);
+    audio.volume = 1.0; // Set the initial volume to 1.0
+    audio.loop = false;
+    audio.src = track[0].src;
+    audio.play();
+    console.log("Starting: Track " + trackNumber + ", instrument " + track[i].name);
+
+    // Update the volume when the volume slider is changed
+    const volumeInput = document.getElementById(`volume${trackNumber}`);
+    if (volumeInput) {
+        volumeInput.addEventListener("input", (event) => {
+            audio.volume = parseFloat(event.target.value);
+        });
+    }
 }
 
 // There is an upload button that adds a sample to samples array and a sample button with an event listener
