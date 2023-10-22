@@ -363,4 +363,68 @@ async function audioToBlob(src) {
 }
 
 
+// Add a reference to the "Record" button
+const recordButton = document.getElementById("record");
+
+// Initialize the Web Audio API variables
+let audioContext;
+let audioStream;
+let mediaRecorder;
+let recordedChunks = [];
+
+recordButton.addEventListener("click", () => {
+    if (recordButton.textContent === "Record") {
+        // Start recording
+        startRecording();
+    } else {
+        // Stop recording and save the sample
+        stopRecording();
+    }
+});
+
+function startRecording() {
+    navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+            audioContext = new AudioContext();
+            audioStream = stream;
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(recordedChunks, { type: "audio/wav" });
+                const audioUrl = URL.createObjectURL(audioBlob);
+
+                // Add the recorded sample to the samples array
+                samples.push({ src: audioUrl, name: "Recording" });
+                const newSampleId = samples.length - 1;
+
+                // Create a button for the recorded sample
+                createSampleButton(samples[newSampleId], newSampleId);
+            };
+
+            mediaRecorder.start();
+            recordButton.textContent = "Stop";
+        })
+        .catch((error) => {
+            console.error("Error accessing the microphone:", error);
+        });
+}
+
+function stopRecording() {
+    if (mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+        audioStream.getTracks().forEach((track) => track.stop());
+        audioContext.close();
+        recordButton.textContent = "Record";
+    }
+}
+
+
+
 // eof
