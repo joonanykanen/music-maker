@@ -12,32 +12,22 @@ samples.push({src: "audio/violin.mp3", name: "Violin"})
 
 // 2D array of tracks – so one track can have multiple samples in a row
 let tracks = []
-tracks.push([])
-tracks.push([])
-tracks.push([])
-tracks.push([])
-
-// Let's add these tracks to HTML page in a horizontal layout
-const tracksDiv = document.getElementById("tracks");
-
-for (let i = 0; i < tracks.length; i++) {
-    const trackDiv = document.createElement("div");
-    trackDiv.classList.add("track");
-    trackDiv.innerHTML = `
-        <h2>Track ${i + 1}</h2>
-        <div id="trackItems${i}" class="track-items"></div>
-    `;
-    tracksDiv.appendChild(trackDiv);
-}
-
+addTrack()
+addTrack()
+addTrack()
+addTrack()
 
 // Function to add a new track
 function addTrack() {
     const trackIndex = tracks.length;
+
+    // Check if this is the first track
+    const isChecked = trackIndex === 0 ? 'checked' : '';
+
     const newTrackDiv = document.createElement("div");
     newTrackDiv.classList.add("form-check");
     newTrackDiv.innerHTML = `
-        <input class="form-check-input" type="radio" name="track" id="track${trackIndex}" value="${trackIndex}">
+        <input class="form-check-input" type="radio" name="track" id="track${trackIndex}" value="${trackIndex}" ${isChecked}>
         <label class="form-check-label" for="track${trackIndex}">Track ${trackIndex + 1}</label>
     `;
     const trackSelectionDiv = document.getElementById("track-selection");
@@ -56,6 +46,7 @@ function addTrack() {
     const tracksDiv = document.getElementById("tracks");
     tracksDiv.appendChild(trackDiv);
 }
+
 
 // Event listener for adding a new track
 const addTrackButton = document.createElement("button");
