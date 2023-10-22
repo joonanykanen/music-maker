@@ -1,7 +1,10 @@
 // Array for mp3 samples, items are object having file source and name
 const samples = []
 const sampleButtons = document.getElementById("sampleButtons");
+
 let id = 0
+let isPlaying = false;
+let audioElements = [];
 
 samples.push({src: "audio/bass.mp3", name: "Bass"})
 samples.push({src: "audio/drum.mp3", name: "Drum"})
@@ -199,16 +202,35 @@ function addSample(addButton) {
 const playButton = document.getElementById("play")
 playButton.addEventListener("click", () => playSong())
 
-// Song is played so that each track is started simultaneously 
 function playSong() {
-    let i = 0;
-    tracks.forEach((track) => {
-        if(track.length > 0) {
-            playTrack(track, i)
-        }
-        i++
-    })
+    if (isPlaying) {
+        // If a song is playing, pause it
+        pauseAllSongs();
+    } else {
+        let i = 0;
+        tracks.forEach((track) => {
+            if(track.length > 0) {
+                const audio = playTrack(track, i);
+                audioElements.push(audio);
+            }
+            i++
+        })
+        isPlaying = true;
+        playButton.textContent = "Pause";
+    }
 }
+
+function pauseAllSongs() {
+    audioElements.forEach(audio => {
+        audio.pause();
+    });
+    
+    // Clear the audio elements for next play
+    audioElements = [];
+    isPlaying = false;
+    playButton.textContent = "Play";
+}
+
 
 function updateTrackVolume(event, trackIndex) {
     const volume = parseFloat(event.target.value);
@@ -245,6 +267,7 @@ function playTrack(track, trackNumber) {
             audio.volume = parseFloat(event.target.value);
         });
     }
+    return audio;
 }
 
 // There is an upload button that adds a sample to samples array and a sample button with an event listener
